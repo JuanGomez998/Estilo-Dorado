@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Estilo Dorado | Lujo urbano en oro laminado</title>
+
+  <!-- Metadatos SEO y Open Graph (Optimizado para WhatsApp, Instagram y redes) -->
+  <meta name="description" content="Estilo Dorado: joyería en oro laminado de triple capa. Piezas con presencia urbana y acabado impecable desde Medellín para todo Colombia." />
+  <meta name="theme-color" content="#1C1C1E" />
+  <link rel="canonical" href="https://juangomez998.github.io/Estilo-Dorado/links/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://juangomez998.github.io/Estilo-Dorado/links/" />
+  <meta property="og:site_name" content="Estilo Dorado" />
+  <meta property="og:title" content="Estilo Dorado | Lujo urbano en oro laminado" />
+  <meta property="og:description" content="Oro laminado de triple capa. Diseñado para quienes avanzan con presencia y estilo propio. Envíos a todo Colombia." />
+  <!-- og-image con fallback al logo o imagen representativa -->
+  <meta property="og:image" content="https://juangomez998.github.io/Estilo-Dorado/img/og-bio.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Estilo Dorado - Joyería en oro laminado de triple capa" />
+  <meta property="og:locale" content="es_CO" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Estilo Dorado | Lujo urbano en oro laminado" />
+  <meta name="twitter:description" content="Oro laminado de triple capa. Diseñado para quienes avanzan con presencia y estilo propio. Envíos a todo Colombia." />
+  <meta name="twitter:image" content="https://juangomez998.github.io/Estilo-Dorado/img/og-bio.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/img/logo.png" />
+  <link rel="apple-touch-icon" href="/img/logo.png" />
+
+  <!-- Google Fonts: Cormorant Garamond (Editorial Serif) + Inter (Sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       VARIABLES Y PALETA "ASFALTO & CARBÓN"
+       ========================================================================== */
+    :root {
+      --asfalto: #1C1C1E;       /* Fondo principal oscuro profundo */
+      --carbon: #2C2C2E;        /* Superficie tarjetas y botones secundarios */
+      --concreto: #52525B;      /* Bordes, detalles sutiles y texto secundario */
+      --oro: #D4AF37;           /* Único punto de luz: foco, detalles y primario */
+      --oro-hover: #E5C358;     /* Brillo tenue en interacción */
+      --tiza: #F2F2F7;          /* Texto principal */
+      
+      --font-serif: 'Cormorant Garamond', Garamond, 'Playfair Display', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      --btn-height: 56px;
+      --btn-radius: 10px;
+      --btn-gap: 14px;
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Reset básico */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: var(--asfalto);
+      color: var(--tiza);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--asfalto);
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 calc(env(safe-area-inset-bottom, 16px) + 24px) 0;
+    }
+
+    /* Textura sutil de asfalto/grano (SVG noise inline ≤ 5% opacidad) */
+    .grain-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Enlace de accesibilidad para saltar al contenido principal */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 16px;
+      background: var(--oro);
+      color: var(--asfalto);
+      padding: 10px 18px;
+      font-weight: 600;
+      border-radius: 6px;
+      z-index: 1000;
+      text-decoration: none;
+      transition: top 200ms ease;
+    }
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    /* Contenedor mobile-first (360px - 430px) */
+    .bio-wrapper {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       1. HERO SECTION (~60% de pantalla)
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      min-height: 56vh;
+      min-height: 56dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      text-align: center;
+      padding: calc(env(safe-area-inset-top, 24px) + 24px) 20px 28px;
+      overflow: hidden;
+    }
+
+    /* Imagen de fondo Hero con efecto b/n alto contraste */
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      filter: grayscale(100%) contrast(135%) brightness(0.72);
+      z-index: 0;
+      transform: scale(1.03);
+      transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Degradado inferior cinematográfico hacia #1C1C1E */
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(28, 28, 30, 0.35) 0%,
+        rgba(28, 28, 30, 0.55) 45%,
+        rgba(28, 28, 30, 0.88) 80%,
+        var(--asfalto) 100%
+      );
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    /* Pequeño avatar / monograma de marca */
+    .brand-badge {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--carbon);
+      border: 1.5px solid var(--concreto);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(18, 18, 20, 0.45);
+    }
+    .brand-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Título: Estilo Dorado */
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: 2.25rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+      color: var(--tiza);
+      margin-bottom: 8px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--oro);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* Subtítulo */
+    .hero-subtitle {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--tiza);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      opacity: 0.92;
+      margin-bottom: 8px;
+    }
+
+    /* Frase de posicionamiento */
+    .hero-phrase {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.0625rem;
+      color: var(--concreto);
+      line-height: 1.4;
+      max-width: 320px;
+      margin-bottom: 20px;
+    }
+
+    /* Fila de iconos sociales SVG (mínimo táctil 44x44px) */
+    .social-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(44, 44, 46, 0.6);
+      border: 1px solid rgba(82, 82, 91, 0.4);
+      color: var(--tiza);
+      text-decoration: none;
+      transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease, transform 200ms ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .social-link svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+      transition: fill 200ms ease;
+    }
+    .social-link:hover {
+      color: var(--oro);
+      border-color: var(--oro);
+      background-color: var(--carbon);
+      transform: translateY(-2px);
+    }
+    .social-link:active {
+      transform: translateY(0);
+      color: var(--oro);
+      border-color: var(--oro);
+    }
+
+    /* ==========================================================================
+       2. TARJETA DE BOTONES (fondo #1C1C1E)
+       ========================================================================== */
+    .links-card {
+      width: 100%;
+      background-color: var(--asfalto);
+      padding: 8px 20px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.625rem;
+      font-weight: 600;
+      color: var(--tiza);
+      letter-spacing: 0.01em;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+    .card-title em {
+      font-style: italic;
+      color: var(--oro);
+      font-weight: 500;
+    }
+
+    .card-hint {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      color: var(--concreto);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* Lista de botones */
+    .links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--btn-gap);
+      width: 100%;
+    }
+
+    .link-item {
+      width: 100%;
+    }
+
+    /* Estilo base de los botones */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: var(--btn-height);
+      min-height: var(--btn-height);
+      padding: 0 20px;
+      border-radius: var(--btn-radius);
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      text-align: center;
+      box-sizing: border-box;
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+    }
+
+    /* Botón Principal (Ver colección) */
+    .btn-primary {
+      background-color: var(--oro);
+      color: var(--asfalto);
+      border: 1px solid var(--oro);
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.22);
+    }
+    .btn-primary:hover {
+      background-color: var(--oro-hover);
+      border-color: var(--oro-hover);
+      color: #121214;
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Botones Secundarios */
+    .btn-secondary {
+      background-color: var(--carbon);
+      color: var(--tiza);
+      border: 1px solid var(--concreto);
+      letter-spacing: 0.01em;
+    }
+    .btn-secondary:hover {
+      border-color: var(--oro);
+      color: var(--oro);
+      background-color: #323235;
+      transform: translateY(-1px);
+    }
+    .btn-secondary:active {
+      border-color: var(--oro);
+      color: var(--oro);
+      transform: translateY(1px);
+    }
+
+    /* Accesibilidad: Foco visible en #D4AF37 */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--oro);
+      outline-offset: 3px;
+    }
+
+    /* ==========================================================================
+       3. PIE DE PÁGINA (Confianza discreta)
+       ========================================================================== */
+    .bio-footer {
+      width: 100%;
+      text-align: center;
+      padding: 24px 20px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .trust-badges {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      color: var(--concreto);
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .trust-badges span {
+      white-space: nowrap;
+    }
+    .trust-sep {
+      color: rgba(82, 82, 91, 0.6);
+      user-select: none;
+    }
+
+    .copyright {
+      font-family: var(--font-sans);
+      font-size: 0.6875rem;
+      color: var(--concreto);
+      opacity: 0.75;
+      letter-spacing: 0.04em;
+    }
+
+    /* ==========================================================================
+       ANIMACIÓN DE ENTRADA SUTIL (Fade + Desplazamiento corto escalonado)
+       ========================================================================== */
+    @keyframes subtleFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-entry {
+      opacity: 0;
+      animation: subtleFadeUp 600ms var(--ease-smooth) forwards;
+    }
+
+    /* Tiempos escalonados */
+    .hero-content {
+      animation: subtleFadeUp 700ms var(--ease-smooth) 100ms forwards;
+      opacity: 0;
+    }
+    .card-header {
+      animation: subtleFadeUp 600ms var(--ease-smooth) 250ms forwards;
+      opacity: 0;
+    }
+    .link-item:nth-child(1) { animation: subtleFadeUp 500ms var(--ease-smooth) 320ms forwards; opacity: 0; }
+    .link-item:nth-child(2) { animation: subtleFadeUp 500ms var(--ease-smooth) 400ms forwards; opacity: 0; }
+    .link-item:nth-child(3) { animation: subtleFadeUp 500ms var(--ease-smooth) 480ms forwards; opacity: 0; }
+    .link-item:nth-child(4) { animation: subtleFadeUp 500ms var(--ease-smooth) 560ms forwards; opacity: 0; }
+    .link-item:nth-child(5) { animation: subtleFadeUp 500ms var(--ease-smooth) 640ms forwards; opacity: 0; }
+    .bio-footer {
+      animation: subtleFadeUp 500ms var(--ease-smooth) 720ms forwards;
+      opacity: 0;
+    }
+
+    /* Respeto a usuarios con sensibilidad a movimiento */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .animate-entry,
+      .hero-content,
+      .card-header,
+      .link-item,
+      .bio-footer {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Capa de grano urbano (asfalto sutil) -->
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- Enlace accesible -->
+  <a class="skip-link" href="#main-buttons">Ir a los enlaces</a>
+
+  <main class="bio-wrapper">
+    <!-- 1. HERO SECTION (~60% de la pantalla) -->
+    <header class="hero-section" id="perfil" role="banner">
+      <!-- Foto de fondo en B/N alto contraste (/img/hero.jpg) -->
+      <img
+        class="hero-bg"
+        src="/img/hero.jpg"
+        alt="Estilo Dorado - Joyería en oro laminado de triple capa"
+        loading="eager"
+        width="800"
+        height="1000"
+        onerror="this.onerror=null; this.src='/img/productos/cadena-caballero.jpg';"
+      />
+      <!-- Scrim oscuro degradado hacia #1C1C1E -->
+      <div class="hero-scrim" aria-hidden="true"></div>
+
+      <!-- Contenido tipográfico y social encima del hero -->
+      <div class="hero-content">
+        <!-- Logo monograma -->
+        <div class="brand-badge" aria-hidden="true">
+          <img src="/img/logo.png" alt="" width="68" height="68" />
+        </div>
+
+        <h1 class="hero-title" id="bio-title">
+          Estilo <em>Dorado</em>
+        </h1>
+        <p class="hero-subtitle" id="bio-subtitle">
+          Lujo urbano en oro laminado de triple capa
+        </p>
+        <p class="hero-phrase" id="bio-phrase">
+          Piezas para quienes lo están logrando
+        </p>
+
+        <!-- Fila de iconos sociales SVG (Instagram, TikTok, WhatsApp; YouTube comentado) -->
+        <nav class="social-row" aria-label="Canales sociales y contacto">
+          <!-- Instagram -->
+          <a
+            class="social-link"
+            id="social-instagram"
+            href="https://instagram.com/estil_odorado"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Síguenos en Instagram @estil_odorado"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+
+          <!-- TikTok -->
+          <a
+            class="social-link"
+            id="social-tiktok"
+            href="https://tiktok.com/@estilo.dorado5"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Síguenos en TikTok @estilo.dorado5"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3 15.28 6.34 6.34 0 0 0 9.34 21.6c3.49 0 6.33-2.83 6.33-6.32V8.71a8.21 8.21 0 0 0 4.92 1.63V6.89a4.84 4.84 0 0 1-1-.2z"/>
+            </svg>
+          </a>
+
+          <!-- WhatsApp -->
+          <a
+            class="social-link"
+            id="social-whatsapp"
+            href="https://wa.me/573024242009?text=Hola%20Estilo%20Dorado%2C%20quiero%20que%20me%20asesoren%20con%20una%20pieza"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Escríbenos directamente a WhatsApp"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12.031 2C6.495 2 2 6.492 2 12.028c0 1.954.557 3.782 1.521 5.334L2 22l4.81-1.488a9.98 9.98 0 0 0 5.221 1.468h.004c5.534 0 10.028-4.493 10.028-10.028 0-2.678-1.042-5.197-2.937-7.091A9.972 9.972 0 0 0 12.031 2zm5.836 14.199c-.244.688-1.229 1.299-1.996 1.465-.526.113-1.215.204-3.528-.755-2.96-1.227-4.869-4.241-5.016-4.437-.146-.197-1.196-1.593-1.196-3.037 0-1.445.756-2.155 1.026-2.449.27-.294.59-.368.788-.368.196 0 .393.002.565.01.182.009.426-.069.666.508.245.59.836 2.043.91 2.19.074.148.123.32.025.516-.099.197-.148.32-.295.492-.148.172-.311.385-.444.517-.148.147-.302.308-.13.603.172.296.767 1.266 1.644 2.049 1.129 1.008 2.08 1.32 2.375 1.468.295.147.467.123.639-.074.172-.197.738-.861.935-1.156.196-.296.393-.246.664-.148.27.099 1.722.812 2.017.96.295.148.492.222.565.345.074.123.074.714-.17 1.402z"/>
+            </svg>
+          </a>
+
+          <!-- YouTube (Comentado por si decides activarlo a futuro)
+          <a
+            class="social-link"
+            id="social-youtube"
+            href="https://youtube.com/@estilodorado"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Canal oficial de YouTube de Estilo Dorado"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+          -->
+        </nav>
+      </div>
+    </header>
+
+    <!-- 2. TARJETA DE BOTONES (fondo #1C1C1E) -->
+    <section class="links-card" id="main-buttons" aria-labelledby="links-heading">
+      <div class="card-header">
+        <h2 class="card-title" id="links-heading">
+          Descubre <em>tu pieza</em>
+        </h2>
+        <p class="card-hint" id="links-hint">
+          Disponibilidad y asesoría directa
+        </p>
+      </div>
+
+      <!-- Botones en orden estricto solicitado -->
+      <ul class="links-list" role="list">
+        <!-- 1. Botón Principal: Ver colección -->
+        <li class="link-item">
+          <a
+            class="btn btn-primary"
+            id="btn-collection"
+            href="https://juangomez998.github.io/Estilo-Dorado/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Ver colección
+          </a>
+        </li>
+
+        <!-- 2. Botón Secundario: Asesórame por WhatsApp -->
+        <li class="link-item">
+          <a
+            class="btn btn-secondary"
+            id="btn-whatsapp"
+            href="https://wa.me/573024242009?text=Hola%20Estilo%20Dorado%2C%20quiero%20que%20me%20asesoren%20con%20una%20pieza"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Asesórame por WhatsApp
+          </a>
+        </li>
+
+        <!-- 3. Botón Secundario: Por qué nuestro oro no se pela -->
+        <li class="link-item">
+          <a
+            class="btn btn-secondary"
+            id="btn-triple-layer"
+            href="https://juangomez998.github.io/Estilo-Dorado/#materiales"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Por qué nuestro oro no se pela
+          </a>
+        </li>
+
+        <!-- 4. Botón Secundario: Envíos a todo Colombia -->
+        <li class="link-item">
+          <a
+            class="btn btn-secondary"
+            id="btn-shipping"
+            href="https://juangomez998.github.io/Estilo-Dorado/#politicas"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Envíos a todo Colombia
+          </a>
+        </li>
+
+        <!-- 5. Botón Secundario: Garantía por cambio de color -->
+        <li class="link-item">
+          <a
+            class="btn btn-secondary"
+            id="btn-warranty"
+            href="https://juangomez998.github.io/Estilo-Dorado/#politicas"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Garantía por cambio de color
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 3. PIE DE PÁGINA (Bloque discreto de confianza) -->
+    <footer class="bio-footer" role="contentinfo">
+      <div class="trust-badges" id="trust-text">
+        <span>Caja oscura</span>
+        <span class="trust-sep" aria-hidden="true">·</span>
+        <span>Certificado de garantía</span>
+        <span class="trust-sep" aria-hidden="true">·</span>
+        <span>Bolsita de conservación</span>
+      </div>
+      <p class="copyright" id="copyright-text">
+        © 2026 Estilo Dorado
+      </p>
+    </footer>
+  </main>
+
+  <!-- ==========================================================================
+       OBJETO DE CONFIGURACIÓN Y SCRIPT LIGERO
+       Permite editar cualquier texto o URL en un solo lugar sin tocar el HTML
+       ========================================================================== -->
+  <script>
+    /**
+     * CONFIGURACIÓN CENTRALIZADA DE ESTILO DORADO (LINK IN BIO)
+     * Edita aquí cualquier texto, enlace o parámetro fácilmente.
+     */
+    const BIO_CONFIG = {
+      brand: {
+        titleHtml: 'Estilo <em>Dorado</em>',
+        subtitle: 'Lujo urbano en oro laminado de triple capa',
+        phrase: 'Piezas para quienes lo están logrando',
+        trustBadges: 'Caja oscura · Certificado de garantía · Bolsita de conservación',
+        copyright: '© 2026 Estilo Dorado'
+      },
+      social: {
+        instagram: 'https://instagram.com/estil_odorado',
+        tiktok: 'https://tiktok.com/@estilo.dorado5',
+        whatsapp: 'https://wa.me/573024242009?text=Hola%20Estilo%20Dorado%2C%20quiero%20que%20me%20asesoren%20con%20una%20pieza',
+        youtube: '' // Opcional: añade la URL de YouTube si activas el icono
+      },
+      buttons: {
+        cardTitleHtml: 'Descubre <em>tu pieza</em>',
+        cardHint: 'Disponibilidad y asesoría directa',
+        items: [
+          {
+            id: 'btn-collection',
+            text: 'Ver colección',
+            url: 'https://juangomez998.github.io/Estilo-Dorado/'
+          },
+          {
+            id: 'btn-whatsapp',
+            text: 'Asesórame por WhatsApp',
+            url: 'https://wa.me/573024242009?text=Hola%20Estilo%20Dorado%2C%20quiero%20que%20me%20asesoren%20con%20una%20pieza'
+          },
+          {
+            id: 'btn-triple-layer',
+            text: 'Por qué nuestro oro no se pela',
+            url: 'https://juangomez998.github.io/Estilo-Dorado/#materiales'
+          },
+          {
+            id: 'btn-shipping',
+            text: 'Envíos a todo Colombia',
+            url: 'https://juangomez998.github.io/Estilo-Dorado/#politicas'
+          },
+          {
+            id: 'btn-warranty',
+            text: 'Garantía por cambio de color',
+            url: 'https://juangomez998.github.io/Estilo-Dorado/#politicas'
+          }
+        ]
+      }
+    };
+
+    // Sincronización automática de elementos en el DOM con BIO_CONFIG
+    (function applyConfig() {
+      try {
+        const titleEl = document.getElementById('bio-title');
+        if (titleEl && BIO_CONFIG.brand.titleHtml) titleEl.innerHTML = BIO_CONFIG.brand.titleHtml;
+
+        const subEl = document.getElementById('bio-subtitle');
+        if (subEl && BIO_CONFIG.brand.subtitle) subEl.textContent = BIO_CONFIG.brand.subtitle;
+
+        const phraseEl = document.getElementById('bio-phrase');
+        if (phraseEl && BIO_CONFIG.brand.phrase) phraseEl.textContent = BIO_CONFIG.brand.phrase;
+
+        const igEl = document.getElementById('social-instagram');
+        if (igEl && BIO_CONFIG.social.instagram) igEl.href = BIO_CONFIG.social.instagram;
+
+        const ttEl = document.getElementById('social-tiktok');
+        if (ttEl && BIO_CONFIG.social.tiktok) ttEl.href = BIO_CONFIG.social.tiktok;
+
+        const waEl = document.getElementById('social-whatsapp');
+        if (waEl && BIO_CONFIG.social.whatsapp) waEl.href = BIO_CONFIG.social.whatsapp;
+
+        const cardHeading = document.getElementById('links-heading');
+        if (cardHeading && BIO_CONFIG.buttons.cardTitleHtml) cardHeading.innerHTML = BIO_CONFIG.buttons.cardTitleHtml;
+
+        const cardHint = document.getElementById('links-hint');
+        if (cardHint && BIO_CONFIG.buttons.cardHint) cardHint.textContent = BIO_CONFIG.buttons.cardHint;
+
+        BIO_CONFIG.buttons.items.forEach(item => {
+          const btn = document.getElementById(item.id);
+          if (btn) {
+            if (item.text) btn.textContent = item.text;
+            if (item.url) btn.href = item.url;
+          }
+        });
+      } catch (err) {
+        console.warn('Configuración cargada desde HTML estático.');
+      }
+    })();
+  </script>
+</body>
+</html>

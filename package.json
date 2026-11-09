@@ -9,6 +9,10 @@
     "preview": "vite preview --host"
   },
   "devDependencies": {
+    "sharp": "^0.35.5",
     "vite": "^5.4.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.0"
   }
 }

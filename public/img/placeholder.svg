@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1200" viewBox="0 0 960 1200">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0D77A"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#A8861F"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="1200" fill="#2C2C2E"/>
+  <rect x="40" y="40" width="880" height="1120" rx="20" fill="none" stroke="#D4AF37" stroke-opacity=".25"/>
+  <circle cx="480" cy="540" r="150" fill="none" stroke="url(#g)" stroke-width="6"/>
+  <text x="480" y="590" text-anchor="middle" font-family="Georgia, serif" font-size="150" font-style="italic" fill="url(#g)">ED</text>
+  <text x="480" y="800" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" letter-spacing="10" fill="#A1A1AA">FOTO PRÓXIMAMENTE</text>
+</svg>
+
