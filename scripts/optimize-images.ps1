@@ -17,3 +17,4 @@ Get-ChildItem $dir -Filter *.jpg | Where-Object Length -gt 280KB | ForEach-Objec
   Move-Item $tmp $_.FullName -Force
   "{0}: {1:N0} KB (q={2})" -f $_.Name, ($size / 1KB), ($q + 6)
 }
+
