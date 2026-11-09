@@ -21,7 +21,7 @@ function productCard(p) {
 
   const media = el('div', { class: 'card-media' });
   if (p.imagen) {
-    const img = el('img', { src: p.imagen, alt: p.alt || nombre, loading: 'lazy', width: 960, height: 1200 });
+    const img = el('img', { src: import.meta.env.BASE_URL + p.imagen.replace(/^\//, ''), alt: p.alt || nombre, loading: 'lazy', width: 960, height: 1200 });
     img.addEventListener('error', () => media.classList.add('is-missing'), { once: true });
     media.append(img);
   } else {
