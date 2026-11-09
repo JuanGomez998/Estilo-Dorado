@@ -1,43 +1,44 @@
-import { initCatalog } from './render.js';
-import { business, materiales, politicas } from './data/business.js';
-import { whatsappLink, instagramLink } from './contact.js';
+// El contenido (catálogo, materiales, políticas) está en index.html.
+// Este archivo solo añade interacción: filtros, menú móvil, header y animaciones.
 
-const fillList = (id, items) => {
-  const ul = document.getElementById(id);
-  if (!ul) return;
-  ul.replaceChildren(...(items?.length ? items : ['Información próximamente.']).map((t) => {
-    const li = document.createElement('li'); li.textContent = t; return li;
-  }));
-};
-
-// Catálogo
-initCatalog();
-
-// Contacto
-document.querySelectorAll('[data-wa]').forEach((a) => (a.href = whatsappLink()));
-document.getElementById('contact-ig').href = instagramLink;
-document.getElementById('contact-meta').textContent =
-  `${business.whatsappVisible} · ${business.instagramUsuario} · ${business.ubicacion}`;
-
-// Materiales
-document.getElementById('materials-intro').textContent = materiales.intro;
-fillList('care-list', materiales.cuidados);
-const layers = document.getElementById('layers');
-materiales.capas.forEach((c, i) => {
-  const d = document.createElement('div');
-  d.className = 'layer';
-  d.style.setProperty('--i', i);
-  d.innerHTML = `<span class="layer-label"></span><span class="layer-text"></span>`;
-  d.querySelector('.layer-label').textContent = c.titulo;
-  d.querySelector('.layer-text').textContent = c.texto || '';
-  layers.append(d);
+// Filtros del catálogo: se construyen a partir de las tarjetas que hay en el HTML.
+const grid = document.getElementById('product-grid');
+const filters = document.getElementById('filters');
+const count = document.getElementById('results-count');
+const cards = [...grid.querySelectorAll('.product-card')];
+const catNames = new Map();
+cards.forEach((c) => {
+  const id = c.dataset.categoria;
+  if (id && !catNames.has(id)) catNames.set(id, c.querySelector('.card-tag')?.textContent.trim() || id);
 });
 
-// Políticas
-fillList('policy-envios', politicas.envios);
-fillList('policy-cambios', politicas.cambios);
-fillList('policy-garantia', politicas.garantia);
-document.getElementById('policy-nota').textContent = politicas.notaLegal;
+const tabs = [['todas', 'Todas'], ...catNames].map(([id, nombre]) => {
+  const n = id === 'todas' ? cards.length : cards.filter((c) => c.dataset.categoria === id).length;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'chip';
+  btn.setAttribute('role', 'tab');
+  btn.setAttribute('aria-controls', 'product-grid');
+  btn.dataset.cat = id;
+  btn.innerHTML = `<span></span><span class="chip-count">${n}</span>`;
+  btn.firstChild.textContent = nombre;
+  btn.addEventListener('click', () => select(id));
+  filters.append(btn);
+  return btn;
+});
+
+function select(id) {
+  let shown = 0;
+  tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.cat === id)));
+  cards.forEach((c) => {
+    const visible = id === 'todas' || c.dataset.categoria === id;
+    c.hidden = !visible;
+    if (visible) shown++;
+  });
+  count.textContent = `${shown} ${shown === 1 ? 'pieza' : 'piezas'}`;
+  grid.classList.remove('fade-in'); void grid.offsetWidth; grid.classList.add('fade-in');
+}
+select('todas');
 
 document.getElementById('year').textContent = new Date().getFullYear();
 

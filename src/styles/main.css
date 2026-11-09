@@ -311,10 +311,58 @@ em { font-style: italic; color: var(--oro); }
 @keyframes pulse { 70% { box-shadow: 0 12px 30px -8px rgba(0,0,0,.7), 0 0 0 16px rgba(212,175,55,0); } }
 
 /* ───────── Aparición ───────── */
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
-.reveal.is-visible { opacity: 1; transform: none; }
+.reveal { opacity: 1; }
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.js .reveal.is-visible { opacity: 1; transform: none; }
+
+/* ───────── Franja de confianza ───────── */
+.trust { border-block: 1px solid var(--linea); background: rgba(44,44,46,.55); }
+.trust-list {
+  list-style: none; margin-block: 0; padding: 1.1rem 0; display: flex; flex-wrap: wrap; justify-content: space-around; gap: .8rem 2rem;
+  font-size: .9rem; font-weight: 500; letter-spacing: .04em; color: var(--tiza);
+}
+.trust-list li { display: flex; align-items: center; gap: .6rem; }
+.trust-list svg, .care-item svg { width: 22px; height: 22px; fill: none; stroke: var(--oro); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+@media (max-width: 560px) { .trust-list { flex-direction: column; align-items: flex-start; padding-inline: .5rem; } }
+
+/* ───────── Cuidados ───────── */
+.care-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; }
+.care-item {
+  background: linear-gradient(160deg, rgba(44,44,46,.9), rgba(28,28,30,.9));
+  border: 1px solid rgba(242,242,247,.07); border-radius: var(--radius); padding: 1.5rem;
+}
+.care-item svg { width: 30px; height: 30px; margin-bottom: 1rem; }
+.care-item h3 { font-size: 1.3rem; margin-bottom: .4rem; }
+.care-item p { color: var(--tiza-70); font-size: .95rem; margin: 0; }
+
+/* ───────── Reseñas ───────── */
+.review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.review-card { margin: 0; padding: 1.75rem; border-radius: var(--radius); background: var(--carbon); border: 1px solid rgba(242,242,247,.07); }
+.review-card blockquote { margin: 0 0 1rem; font: italic 500 1.3rem/1.4 var(--serif); color: var(--tiza); }
+.review-card figcaption { color: var(--tiza-70); font-size: .9rem; }
+.review-card strong { color: var(--oro); font-weight: 600; }
+@media (max-width: 900px) { .review-grid { grid-template-columns: 1fr; } }
+
+/* ───────── Redes en el pie ───────── */
+.social { list-style: none; margin: 0; padding: 0; display: flex; gap: .75rem; align-items: center; }
+.social a {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--linea); transition: border-color .3s, transform .3s var(--ease);
+}
+.social a:hover { border-color: #D4AF37; transform: translateY(-2px); }
+.social svg { width: 20px; height: 20px; fill: #D4AF37; }
+.social svg.stroke { fill: none; stroke: #D4AF37; stroke-width: 1.8; }
+.footer-inner { align-items: center; }
+
+.product-card[hidden] { display: none; }
+.card-desc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-price { margin-top: .35rem; }
+
+/* WhatsApp flotante solo en móvil */
+@media (min-width: 901px) { .wa-float { display: none; } }
+@media (max-width: 900px) { .wa-float { width: 52px; height: 52px; right: 1rem; bottom: 1rem; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-  .reveal { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
 }
