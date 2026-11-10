@@ -1,15 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-//  CONFIGURACIÓN DE SUPABASE — único archivo que debes editar.
-//  Pega aquí la "Project URL" y la "anon public key" de tu proyecto
-//  (Supabase → Project Settings → API).
-//
-//  ⚠️ NUNCA pongas aquí la "service_role key". Esa clave salta toda la
-//  seguridad y no debe estar en ningún archivo del sitio.
-//
-//  Mientras estos valores sigan siendo los marcadores, la tienda funciona
-//  con el catálogo de respaldo y el panel /admin no podrá iniciar sesión.
-// ─────────────────────────────────────────────────────────────
+// Configuración de conexión con Supabase (Estilo Dorado)
 window.ED_CONFIG = {
-  SUPABASE_URL: 'PEGA_AQUI_TU_SUPABASE_URL',
-  SUPABASE_ANON_KEY: 'PEGA_AQUI_TU_SUPABASE_ANON_KEY',
+  SUPABASE_URL: 'https://irsviwnpplmtbjpgqqfi.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_3Bc42A11_jUaF2O4N8-H7g_NxwEhTg3',
 };

@@ -104,3 +104,4 @@ window.ED_CONFIG = {
 - **Catálogo de Respaldo Estático:** Si por cualquier motivo Supabase no responde o el usuario no tiene conexión estable, la tienda muestra de inmediato las piezas en HTML estático sin pantallas en blanco ni fallos visuales.
 - **Seguridad RLS (Row Level Security):** La base de datos solo permite lectura pública de piezas visibles. Solo un usuario autenticado y registrado en la tabla `admins` puede modificar la tienda o ver métricas.
 - **Analítica Anónima:** Los eventos de clics y vistas se registran sin almacenar cookies invasivas ni datos personales, cumpliendo con buenas prácticas de privacidad.
+

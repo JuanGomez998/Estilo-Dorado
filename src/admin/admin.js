@@ -823,3 +823,4 @@ function escapeHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', initAdmin);
+
