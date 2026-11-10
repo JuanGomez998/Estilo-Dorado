@@ -140,13 +140,17 @@ async function verifyAdminUser(user) {
 
 function showAuthScreen() {
   authScreen.hidden = false;
+  authScreen.style.display = 'grid';
   dashboardScreen.hidden = true;
+  dashboardScreen.style.display = 'none';
 }
 
 function showDashboard(user) {
   currentUser = user;
   authScreen.hidden = true;
+  authScreen.style.display = 'none';
   dashboardScreen.hidden = false;
+  dashboardScreen.style.display = 'flex';
   userEmailBadge.textContent = user.email || 'Admin';
 
   // Cargar datos
