@@ -139,6 +139,7 @@ async function verifyAdminUser(user) {
 }
 
 function showAuthScreen() {
+  document.body.classList.remove('is-authenticated');
   authScreen.hidden = false;
   authScreen.style.display = 'grid';
   dashboardScreen.hidden = true;
@@ -147,6 +148,7 @@ function showAuthScreen() {
 
 function showDashboard(user) {
   currentUser = user;
+  document.body.classList.add('is-authenticated');
   authScreen.hidden = true;
   authScreen.style.display = 'none';
   dashboardScreen.hidden = false;

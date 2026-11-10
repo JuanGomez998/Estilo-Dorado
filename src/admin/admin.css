@@ -20,6 +20,12 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
+
+/* Control infalible de pantallas Auth / Dashboard */
+body.is-authenticated .admin-auth-screen { display: none !important; }
+body.is-authenticated .admin-dashboard { display: flex !important; }
+body:not(.is-authenticated) .admin-dashboard { display: none !important; }
+body:not(.is-authenticated) .admin-auth-screen { display: grid !important; }
 body {
   margin: 0;
   font-family: var(--sans);
