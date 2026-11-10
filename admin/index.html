@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estilo Dorado | Panel de Administración</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#1C1C1E" />
+  <link rel="icon" type="image/png" href="/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/admin/admin.css" />
+</head>
+<body>
+  <!-- Toast de notificaciones -->
+  <div id="admin-toast" class="admin-toast" role="status" aria-live="polite"></div>
+
+  <!-- PANTALLA 1: INICIO DE SESIÓN -->
+  <div id="auth-screen" class="admin-auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <img src="/img/logo.png" alt="Estilo Dorado" width="56" height="56" />
+        <h1>Estilo <em>Dorado</em></h1>
+        <p>Panel de Administración</p>
+      </div>
+
+      <div id="config-warning" class="auth-alert" hidden>
+        <strong>⚠️ Configuración pendiente:</strong><br />
+        Debes colocar tu <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code> en <code>/js/config.js</code> antes de poder iniciar sesión.
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Correo electrónico</label>
+          <input type="email" id="login-email" required autocomplete="email" placeholder="admin@estilodorado.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" />
+        </div>
+
+        <div id="login-error" class="form-error" hidden></div>
+
+        <button type="submit" class="btn btn-gold btn-block" id="login-btn">
+          Ingresar al panel
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <a href="../" class="auth-back">← Volver a la tienda</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA 2: DASHBOARD (ADMIN LOGUEADO) -->
+  <div id="admin-dashboard" class="admin-dashboard" hidden>
+    <!-- Header superior -->
+    <header class="admin-header">
+      <div class="admin-header-inner">
+        <div class="admin-logo">
+          <img src="/img/logo.png" alt="" width="36" height="36" />
+          <span class="admin-title">Estilo Dorado · Admin</span>
+        </div>
+        <div class="admin-user-nav">
+          <span id="user-email-badge" class="user-badge"></span>
+          <a href="../" target="_blank" class="btn btn-ghost btn-sm" title="Ver tienda pública">Ver tienda ↗</a>
+          <button type="button" class="btn btn-ghost btn-sm" id="logout-btn">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navegación por pestañas móvil-primero -->
+    <nav class="admin-tabs-nav" aria-label="Secciones del panel">
+      <div class="admin-tabs-inner">
+        <button type="button" class="tab-btn active" data-tab="resumen">
+          📊 Resumen
+        </button>
+        <button type="button" class="tab-btn" data-tab="productos">
+          💎 Productos
+        </button>
+        <button type="button" class="tab-btn" data-tab="resenas">
+          ⭐ Reseñas
+        </button>
+        <button type="button" class="tab-btn" data-tab="ajustes">
+          ⚙️ Ajustes
+        </button>
+      </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="admin-main">
+      <!-- 1. PESTAÑA: RESUMEN / ANALÍTICA -->
+      <section id="tab-resumen" class="admin-tab-pane active">
+        <div class="pane-header">
+          <div>
+            <h2>Resumen de Rendimiento</h2>
+            <p class="pane-sub">Métricas de interacción capturadas de forma anónima.</p>
+          </div>
+          <div class="date-filter-group">
+            <button type="button" class="pill-btn active" data-days="7">Últimos 7 días</button>
+            <button type="button" class="pill-btn" data-days="30">Últimos 30 días</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Clics a WhatsApp</span>
+            <span class="stat-value" id="stat-wa-clicks">0</span>
+            <span class="stat-hint">Consultas y pedidos iniciados</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Vistas de Producto</span>
+            <span class="stat-value" id="stat-views">0</span>
+            <span class="stat-hint">Fichas técnicas abiertas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Agregados al Carrito</span>
+            <span class="stat-value" id="stat-cart-adds">0</span>
+            <span class="stat-hint">Intenciones de compra</span>
+          </div>
+        </div>
+
+        <div class="pane-card">
+          <h3>Rendimiento por Producto</h3>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Pieza</th>
+                  <th>Vistas</th>
+                  <th>En Carrito</th>
+                  <th>Clics WhatsApp</th>
+                </tr>
+              </thead>
+              <tbody id="stats-products-table">
+                <tr><td colspan="4" class="text-center">Cargando métricas...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PESTAÑA: PRODUCTOS -->
+      <section id="tab-productos" class="admin-tab-pane">
+        <div class="pane-header">
+          <div>
+            <h2>Catálogo de Productos</h2>
+            <p class="pane-sub">Administra inventario, fotos, precios y orden de exhibición.</p>
+          </div>
+          <button type="button" class="btn btn-gold" id="btn-new-product">
+            + Nuevo Producto
+          </button>
+        </div>
+
+        <div class="table-toolbar">
+          <input type="search" id="product-search-input" class="search-input" placeholder="Buscar por nombre o categoría..." />
+        </div>
+
+        <div id="products-list-container" class="products-admin-grid">
+          <!-- Renderizado dinámico -->
+        </div>
+      </section>
+
+      <!-- 3. PESTAÑA: RESEÑAS -->
+      <section id="tab-resenas" class="admin-tab-pane">
+        <div class="pane-header">
+          <div>
+            <h2>Reseñas de Clientes</h2>
+            <p class="pane-sub">Opiniones visibles en la página de inicio.</p>
+          </div>
+          <button type="button" class="btn btn-gold" id="btn-new-review">
+            + Nueva Reseña
+          </button>
+        </div>
+
+        <div id="reviews-list-container" class="reviews-admin-grid">
+          <!-- Renderizado dinámico -->
+        </div>
+      </section>
+
+      <!-- 4. PESTAÑA: AJUSTES -->
+      <section id="tab-ajustes" class="admin-tab-pane">
+        <div class="pane-header">
+          <div>
+            <h2>Ajustes de la Tienda</h2>
+            <p class="pane-sub">Textos de la barra promocional, WhatsApp y políticas de compra.</p>
+          </div>
+        </div>
+
+        <form id="settings-form" class="settings-form pane-card">
+          <div class="form-group">
+            <label for="set-whatsapp">Número de WhatsApp (con indicativo de país)</label>
+            <input type="text" id="set-whatsapp" name="whatsapp_number" placeholder="573024242009" />
+            <small>Solo dígitos. Ejemplo para Colombia: 573024242009</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="set-banner-text">Texto de la barra de anuncio superior</label>
+              <input type="text" id="set-banner-text" name="banner_text" placeholder="Envíos a todo Colombia · 5 años de garantía" />
+            </div>
+            <div class="form-group">
+              <label for="set-banner-visible">Mostrar anuncio</label>
+              <select id="set-banner-visible" name="banner_visible" class="select-dark">
+                <option value="true">Sí (Visible)</option>
+                <option value="false">No (Oculto)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="set-free-shipping">Monto mínimo para Envío Gratis en COP (0 = deshabilitado)</label>
+            <input type="number" id="set-free-shipping" name="free_shipping_min" min="0" step="5000" placeholder="0" />
+            <small>Ejemplo: 120000 para envíos gratis a partir de $120.000 COP.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="set-shipping">Texto de Envíos (un punto por línea)</label>
+            <textarea id="set-shipping" name="shipping_text" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="set-returns">Texto de Cambios y Devoluciones (un punto por línea)</label>
+            <textarea id="set-returns" name="returns_text" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="set-warranty">Texto de Garantía (un punto por línea)</label>
+            <textarea id="set-warranty" name="warranty_text" rows="3"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-gold" id="btn-save-settings">
+              Guardar Ajustes
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR PRODUCTO -->
+  <div id="product-editor-modal" class="admin-modal" aria-hidden="true">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3 id="product-editor-title">Nuevo Producto</h3>
+        <button type="button" class="admin-modal-close" id="product-editor-close">✕</button>
+      </div>
+
+      <form id="product-editor-form" class="admin-modal-body">
+        <input type="hidden" id="p-edit-id" />
+
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="p-edit-name">Nombre de la pieza *</label>
+            <input type="text" id="p-edit-name" required placeholder="Ej: Manilla balines con cordón" />
+          </div>
+          <div class="form-group flex-1">
+            <label for="p-edit-slug">Slug (URL) *</label>
+            <input type="text" id="p-edit-slug" required pattern="^[a-z0-9]+(-[a-z0-9]+)*$" placeholder="manilla-balines" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="p-edit-category">Categoría *</label>
+            <input type="text" id="p-edit-category" list="category-suggestions" required placeholder="Manillas, Cadenas, Dúos..." />
+            <datalist id="category-suggestions">
+              <option value="Manillas"></option>
+              <option value="Cadenas"></option>
+              <option value="Dúos"></option>
+              <option value="Dijes"></option>
+              <option value="Anillos"></option>
+              <option value="Topos"></option>
+              <option value="Candongas"></option>
+            </datalist>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="p-edit-price">Precio en COP *</label>
+            <input type="number" id="p-edit-price" required min="0" step="1000" placeholder="38000" />
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="p-edit-stock">Inventario (Stock) *</label>
+            <input type="number" id="p-edit-stock" required min="0" placeholder="10" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="p-edit-badge">Etiqueta destacada (opcional)</label>
+            <select id="p-edit-badge" class="select-dark">
+              <option value="">Sin etiqueta</option>
+              <option value="Nuevo">Nuevo</option>
+              <option value="Más vendido">Más vendido</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="p-edit-order">Orden de aparición (menor = primero)</label>
+            <input type="number" id="p-edit-order" value="10" step="5" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="p-edit-description">Descripción de la pieza</label>
+          <textarea id="p-edit-description" rows="2" placeholder="Detalle breve de la joya, tejido o materiales..."></textarea>
+        </div>
+
+        <!-- SECCIÓN DE FOTOS CON SUBIDA Y COMPRESIÓN DESDE EL CELULAR -->
+        <div class="form-group">
+          <label>Fotos de la pieza (la primera será la portada)</label>
+          <div class="photo-upload-zone">
+            <input type="file" id="p-photo-input" multiple accept="image/*" class="file-input-hidden" />
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-pick-photos">
+              📸 Seleccionar o tomar fotos desde el celular
+            </button>
+            <span class="upload-hint">Se comprimirán automáticamente antes de subirse</span>
+          </div>
+
+          <div id="photos-preview-strip" class="photos-preview-strip">
+            <!-- Fotos agregadas -->
+          </div>
+        </div>
+
+        <div class="form-switches-row">
+          <label class="switch-label">
+            <input type="checkbox" id="p-edit-visible" checked />
+            <span>Visible en la tienda</span>
+          </label>
+          <label class="switch-label">
+            <input type="checkbox" id="p-edit-featured" />
+            <span>Pieza destacada</span>
+          </label>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-ghost" id="product-editor-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-gold" id="p-editor-save-btn">Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR RESEÑA -->
+  <div id="review-editor-modal" class="admin-modal" aria-hidden="true">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3 id="review-editor-title">Nueva Reseña</h3>
+        <button type="button" class="admin-modal-close" id="review-editor-close">✕</button>
+      </div>
+
+      <form id="review-editor-form" class="admin-modal-body">
+        <input type="hidden" id="r-edit-id" />
+
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="r-edit-author">Nombre o inicial del cliente *</label>
+            <input type="text" id="r-edit-author" required placeholder="Ej: Camila R." />
+          </div>
+          <div class="form-group flex-1">
+            <label for="r-edit-city">Ciudad</label>
+            <input type="text" id="r-edit-city" placeholder="Ej: Medellín" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="r-edit-rating">Calificación</label>
+          <select id="r-edit-rating" class="select-dark">
+            <option value="5">★★★★★ (5 estrellas)</option>
+            <option value="4">★★★★☆ (4 estrellas)</option>
+            <option value="3">★★★☆☆ (3 estrellas)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="r-edit-text">Comentario del cliente *</label>
+          <textarea id="r-edit-text" rows="3" required placeholder="Opinión sobre la joya, la atención o el envío..."></textarea>
+        </div>
+
+        <div class="form-switches-row">
+          <label class="switch-label">
+            <input type="checkbox" id="r-edit-visible" checked />
+            <span>Visible en la tienda</span>
+          </label>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn btn-ghost" id="review-editor-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-gold" id="r-editor-save-btn">Guardar Reseña</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Configuración de Supabase -->
+  <script src="/js/config.js"></script>
+
+  <!-- Lógica del panel de administración -->
+  <script type="module" src="/src/admin/admin.js"></script>
+</body>
+</html>

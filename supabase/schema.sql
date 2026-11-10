@@ -7,7 +7,7 @@
 create extension if not exists pgcrypto;
 
 -- ─────────────── Administradores ───────────────
--- Solo los usuarios que estén en esta tabla pueden escribir.
+-- Solo los usuarios que estén en esta tabla pueden escribir en la tienda.
 -- Después de crear tu usuario en Authentication, agrégalo aquí (ver README).
 create table if not exists public.admins (
   user_id uuid primary key references auth.users (id) on delete cascade,
@@ -91,12 +91,11 @@ begin
   end loop;
 end $$;
 
--- admins: solo un admin puede ver la lista. Nadie puede modificarla desde la web
--- (se gestiona desde el SQL Editor).
+-- admins: solo un admin puede ver la lista
 create policy "admins_select_admin" on public.admins
   for select to authenticated using (public.is_admin());
 
--- products: el público ve solo los visibles; el admin ve y edita todo.
+-- products: el público ve solo los visibles; el admin ve y edita todo
 create policy "products_select_public" on public.products
   for select to anon, authenticated using (is_visible or public.is_admin());
 create policy "products_insert_admin" on public.products
@@ -106,7 +105,7 @@ create policy "products_update_admin" on public.products
 create policy "products_delete_admin" on public.products
   for delete to authenticated using (public.is_admin());
 
--- reviews: el público ve solo las visibles; el admin todo.
+-- reviews: el público ve solo las visibles; el admin todo
 create policy "reviews_select_public" on public.reviews
   for select to anon, authenticated using (is_visible or public.is_admin());
 create policy "reviews_insert_admin" on public.reviews
@@ -116,7 +115,7 @@ create policy "reviews_update_admin" on public.reviews
 create policy "reviews_delete_admin" on public.reviews
   for delete to authenticated using (public.is_admin());
 
--- settings: lectura pública; escritura solo admin.
+-- settings: lectura pública; escritura solo admin
 create policy "settings_select_public" on public.settings
   for select to anon, authenticated using (true);
 create policy "settings_insert_admin" on public.settings
@@ -126,10 +125,10 @@ create policy "settings_update_admin" on public.settings
 create policy "settings_delete_admin" on public.settings
   for delete to authenticated using (public.is_admin());
 
--- events: cualquiera puede registrar un evento; solo el admin puede leerlos o borrarlos.
+-- events: cualquiera puede registrar un evento válido; solo el admin puede leerlos o borrarlos
 create policy "events_insert_public" on public.events
   for insert to anon, authenticated
-  with check (created_at > now() - interval '1 minute' and created_at < now() + interval '1 minute');
+  with check (type in ('whatsapp_click', 'product_view', 'add_to_cart'));
 create policy "events_select_admin" on public.events
   for select to authenticated using (public.is_admin());
 create policy "events_delete_admin" on public.events
@@ -139,7 +138,7 @@ create policy "events_delete_admin" on public.events
 revoke all on public.admins, public.products, public.reviews, public.settings, public.events from anon, authenticated;
 grant select on public.products, public.reviews, public.settings to anon, authenticated;
 grant insert, update, delete on public.products, public.reviews, public.settings to authenticated;
-grant insert (type, product_id) on public.events to anon, authenticated;
+grant insert on public.events to anon, authenticated;
 grant select, delete on public.events to authenticated;
 grant select on public.admins to authenticated;
 grant execute on function public.is_admin() to anon, authenticated;
@@ -168,7 +167,6 @@ create policy "productos_delete_admin" on storage.objects
 
 -- ═════════════════════════════════════════════════════════════════
 --  DATOS INICIALES (de ejemplo; edítalos luego desde /admin)
---  Las rutas de imagen relativas (img/...) apuntan a las fotos del sitio.
 -- ═════════════════════════════════════════════════════════════════
 insert into public.settings (key, value) values
   ('whatsapp_number', '573024242009'),
@@ -179,6 +177,13 @@ insert into public.settings (key, value) values
   ('warranty_text', E'Cubre el color de la joya durante 5 años.\nNo cubre daños por mal uso, contacto con químicos ni arreglos hechos por terceros.\nPara reclamarla, escríbenos por WhatsApp con fotos de la pieza y la fecha de compra.'),
   ('free_shipping_min', '0')
 on conflict (key) do nothing;
+
+-- Reseñas iniciales de ejemplo (visibles)
+insert into public.reviews (author, city, text, rating, is_visible) values
+  ('Camila R.', 'Medellín', 'Compré la manilla de balines hace 6 meses y sigue igualita de brillante que el primer día. Excelente calidad.', 5, true),
+  ('Andrés M.', 'Bogotá', 'La cadena tejido torcido tiene un peso y un brillo espectacular. El pedido llegó a Bogotá en 2 días.', 5, true),
+  ('Valentina G.', 'Cali', 'Excelente atención por WhatsApp, me asesoraron súper bien para elegir el dúo para regalo. Recomendadísimos.', 5, true)
+on conflict do nothing;
 
 --SEED_PRODUCTS--
 insert into public.products (name, slug, description, price, category, images, stock, is_featured, is_visible, badge, sort_order) values
