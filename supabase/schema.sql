@@ -185,6 +185,10 @@ insert into public.reviews (author, city, text, rating, is_visible) values
   ('Valentina G.', 'Cali', 'Excelente atención por WhatsApp, me asesoraron súper bien para elegir el dúo para regalo. Recomendadísimos.', 5, true)
 on conflict do nothing;
 
+-- Usuario administrador configurado
+insert into public.admins (user_id) values ('1efe7ffd-18c3-4737-a159-9a752edb0285')
+on conflict (user_id) do nothing;
+
 --SEED_PRODUCTS--
 insert into public.products (name, slug, description, price, category, images, stock, is_featured, is_visible, badge, sort_order) values
   ('Manilla balines con cordón negro', 'manilla-balines-cordon-negro', 'Balines lisos y tallados sobre cordón tejido. La que más piden.', 38000, 'Manillas', array['img/productos/manilla-balines-cordon.webp'], 12, true, true, 'Más vendido', 10),
