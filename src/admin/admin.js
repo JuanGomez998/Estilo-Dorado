@@ -11,46 +11,24 @@ let currentReviews = [];
 let editingProductImages = [];
 let analyticsDays = 7;
 
-// Elementos DOM
-const authScreen = document.getElementById('auth-screen');
-const dashboardScreen = document.getElementById('admin-dashboard');
-const loginForm = document.getElementById('login-form');
-const loginEmail = document.getElementById('login-email');
-const loginPassword = document.getElementById('login-password');
-const loginError = document.getElementById('login-error');
-const loginBtn = document.getElementById('login-btn');
-const configWarning = document.getElementById('config-warning');
-const userEmailBadge = document.getElementById('user-email-badge');
-const logoutBtn = document.getElementById('logout-btn');
-const toastEl = document.getElementById('admin-toast');
-
-// Pestañas
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabPanes = document.querySelectorAll('.admin-tab-pane');
-
-// Modal producto
-const productModal = document.getElementById('product-editor-modal');
-const productForm = document.getElementById('product-editor-form');
-const pTitle = document.getElementById('product-editor-title');
-const pCloseBtn = document.getElementById('product-editor-close');
-const pCancelBtn = document.getElementById('product-editor-cancel');
-const pPhotoInput = document.getElementById('p-photo-input');
-const btnPickPhotos = document.getElementById('btn-pick-photos');
-const photosPreviewStrip = document.getElementById('photos-preview-strip');
-
-// Modal reseña
-const reviewModal = document.getElementById('review-editor-modal');
-const reviewForm = document.getElementById('review-editor-form');
-const rTitle = document.getElementById('review-editor-title');
-const rCloseBtn = document.getElementById('review-editor-close');
-const rCancelBtn = document.getElementById('review-editor-cancel');
-
 // ─────────────────────────────────────────────────────────────
-//  INICIO Y AUTENTICACIÓN
+//  INICIALIZACIÓN PRINCIPAL
 // ─────────────────────────────────────────────────────────────
 async function initAdmin() {
+  console.log('[Admin] Inicializando panel...');
+
+  // 1. Conectar listeners de la interfaz (pestañas, modales, formularios) PRIMERO
+  setupNavigation();
+  setupProductEditor();
+  setupReviewEditor();
+  setupSettingsForm();
+  setupAnalyticsControls();
+  setupAuthEvents();
+
+  // 2. Verificar configuración de Supabase
   if (!hasConfig()) {
-    configWarning.hidden = false;
+    const configWarning = document.getElementById('config-warning');
+    if (configWarning) configWarning.hidden = false;
   }
 
   supabase = await getClient();
@@ -59,69 +37,86 @@ async function initAdmin() {
     return;
   }
 
-  // Verificar sesión existente
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session && session.user) {
-    const isOk = await verifyAdminUser(session.user);
-    if (isOk) {
-      showDashboard(session.user);
-      return;
-    }
-  }
-
-  showAuthScreen();
-
-  // Escuchar cambios de autenticación
+  // 3. Escuchar cambios de autenticación
   supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
+    console.log('[Admin Auth State]:', event);
+    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
       const isOk = await verifyAdminUser(session.user);
       if (isOk) showDashboard(session.user);
+      else showAuthScreen();
     } else if (event === 'SIGNED_OUT') {
       showAuthScreen();
     }
   });
 
-  // Login handler
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    loginError.hidden = true;
-    loginBtn.disabled = true;
-    loginBtn.textContent = 'Verificando...';
-
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-
-      const isOk = await verifyAdminUser(data.user);
-      if (!isOk) {
-        await supabase.auth.signOut();
-        throw new Error('Tu usuario no está registrado en la tabla "admins" de Supabase. Revisa el README.md.');
+  // 4. Verificar sesión existente al cargar
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const isOk = await verifyAdminUser(session.user);
+      if (isOk) {
+        showDashboard(session.user);
+        return;
       }
-
-      showDashboard(data.user);
-    } catch (err) {
-      loginError.textContent = err.message || 'Error al iniciar sesión';
-      loginError.hidden = false;
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = 'Ingresar al panel';
     }
-  });
+  } catch (err) {
+    console.warn('[Admin] Error verificando sesión:', err);
+  }
 
-  // Logout handler
-  logoutBtn.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    showAuthScreen();
-  });
+  showAuthScreen();
+}
 
-  setupNavigation();
-  setupProductEditor();
-  setupReviewEditor();
-  setupSettingsForm();
-  setupAnalyticsControls();
+function setupAuthEvents() {
+  const loginForm = document.getElementById('login-form');
+  const loginEmail = document.getElementById('login-email');
+  const loginPassword = document.getElementById('login-password');
+  const loginError = document.getElementById('login-error');
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.hidden = true;
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Verificando...';
+
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        const isOk = await verifyAdminUser(data.user);
+        if (!isOk) {
+          await supabase.auth.signOut();
+          throw new Error('Tu usuario no está registrado en la tabla "admins" de Supabase.');
+        }
+
+        showDashboard(data.user);
+      } catch (err) {
+        loginError.textContent = err.message || 'Error al iniciar sesión';
+        loginError.hidden = false;
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Ingresar al panel';
+      }
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      console.log('[Admin] Cerrando sesión...');
+      try {
+        if (supabase) await supabase.auth.signOut();
+      } catch (err) {
+        console.error('Error al cerrar sesión:', err);
+      }
+      showAuthScreen();
+    });
+  }
 }
 
 async function verifyAdminUser(user) {
@@ -140,29 +135,44 @@ async function verifyAdminUser(user) {
 
 function showAuthScreen() {
   document.body.classList.remove('is-authenticated');
-  authScreen.hidden = false;
-  authScreen.style.display = 'grid';
-  dashboardScreen.hidden = true;
-  dashboardScreen.style.display = 'none';
+  const authScreen = document.getElementById('auth-screen');
+  const dashboardScreen = document.getElementById('admin-dashboard');
+  if (authScreen) {
+    authScreen.hidden = false;
+    authScreen.style.setProperty('display', 'grid', 'important');
+  }
+  if (dashboardScreen) {
+    dashboardScreen.hidden = true;
+    dashboardScreen.style.setProperty('display', 'none', 'important');
+  }
 }
 
 function showDashboard(user) {
   currentUser = user;
   document.body.classList.add('is-authenticated');
-  authScreen.hidden = true;
-  authScreen.style.display = 'none';
-  dashboardScreen.hidden = false;
-  dashboardScreen.style.display = 'flex';
-  userEmailBadge.textContent = user.email || 'Admin';
+  const authScreen = document.getElementById('auth-screen');
+  const dashboardScreen = document.getElementById('admin-dashboard');
+  const userEmailBadge = document.getElementById('user-email-badge');
 
-  // Cargar datos
+  if (authScreen) {
+    authScreen.hidden = true;
+    authScreen.style.setProperty('display', 'none', 'important');
+  }
+  if (dashboardScreen) {
+    dashboardScreen.hidden = false;
+    dashboardScreen.style.setProperty('display', 'flex', 'important');
+  }
+  if (userEmailBadge) {
+    userEmailBadge.textContent = user.email || 'Admin';
+  }
+
+  // Cargar datos de la pestaña inicial
   loadAnalytics();
-  loadProducts();
-  loadReviews();
-  loadSettings();
 }
 
 function showToast(message, type = 'success') {
+  const toastEl = document.getElementById('admin-toast');
+  if (!toastEl) return;
   toastEl.textContent = message;
   toastEl.className = `admin-toast is-visible is-${type}`;
   setTimeout(() => {
@@ -171,12 +181,18 @@ function showToast(message, type = 'success') {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  PESTAÑAS
+//  PESTAÑAS DE NAVEGACIÓN
 // ─────────────────────────────────────────────────────────────
 function setupNavigation() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.admin-tab-pane');
+
   tabBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const target = btn.dataset.tab;
+      console.log('[Admin Tab Click]:', target);
+
       tabBtns.forEach((b) => b.classList.toggle('active', b === btn));
       tabPanes.forEach((p) => p.classList.toggle('active', p.id === `tab-${target}`));
 
@@ -193,7 +209,8 @@ function setupNavigation() {
 // ─────────────────────────────────────────────────────────────
 function setupAnalyticsControls() {
   document.querySelectorAll('.pill-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       document.querySelectorAll('.pill-btn').forEach((b) => b.classList.toggle('active', b === btn));
       analyticsDays = Number(btn.dataset.days) || 7;
       loadAnalytics();
@@ -206,6 +223,8 @@ async function loadAnalytics() {
   const statViewsEl = document.getElementById('stat-views');
   const statCartEl = document.getElementById('stat-cart-adds');
   const tableBody = document.getElementById('stats-products-table');
+
+  if (!tableBody || !supabase) return;
 
   const cutoff = new Date(Date.now() - analyticsDays * 24 * 60 * 60 * 1000).toISOString();
 
@@ -235,11 +254,10 @@ async function loadAnalytics() {
       }
     });
 
-    statWaEl.textContent = waClicks;
-    statViewsEl.textContent = views;
-    statCartEl.textContent = cartAdds;
+    if (statWaEl) statWaEl.textContent = waClicks;
+    if (statViewsEl) statViewsEl.textContent = views;
+    if (statCartEl) statCartEl.textContent = cartAdds;
 
-    // Asegurar que tengamos los productos para mostrar nombres
     if (currentProducts.length === 0) {
       const { data: prods } = await supabase.from('products').select('id, name, slug');
       if (prods) currentProducts = prods;
@@ -249,7 +267,7 @@ async function loadAnalytics() {
       .map(([id, stats]) => {
         const prod = currentProducts.find((p) => p.id === id);
         return {
-          name: prod ? prod.name : 'Pieza eliminada o general',
+          name: prod ? prod.name : 'Pieza general o eliminada',
           views: stats.views,
           cart: stats.cart,
           wa: stats.wa,
@@ -282,6 +300,7 @@ async function loadAnalytics() {
 // ─────────────────────────────────────────────────────────────
 async function loadProducts() {
   const container = document.getElementById('products-list-container');
+  if (!container || !supabase) return;
   container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--tiza-70);">Cargando catálogo...</div>';
 
   try {
@@ -301,7 +320,10 @@ async function loadProducts() {
 
 function renderProductsList() {
   const container = document.getElementById('products-list-container');
-  const query = (document.getElementById('product-search-input').value || '').toLowerCase();
+  if (!container) return;
+
+  const searchInput = document.getElementById('product-search-input');
+  const query = (searchInput?.value || '').toLowerCase();
 
   const filtered = currentProducts.filter(
     (p) => p.name.toLowerCase().includes(query) || (p.category || '').toLowerCase().includes(query)
@@ -348,9 +370,9 @@ function renderProductsList() {
     })
     .join('');
 
-  // Eventos de los botones de cada fila
   container.querySelectorAll('[data-action]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
       const action = btn.dataset.action;
       const id = btn.dataset.id;
       const prod = currentProducts.find((p) => p.id === id);
@@ -398,125 +420,139 @@ function renderProductsList() {
   });
 }
 
-// Búsqueda de productos
-document.getElementById('product-search-input').addEventListener('input', renderProductsList);
-document.getElementById('btn-new-product').addEventListener('click', () => openProductEditor(null));
-
-// ─────────────────────────────────────────────────────────────
-//  EDITOR DE PRODUCTOS Y SUBIDA DE FOTOS CON COMPRESIÓN
-// ─────────────────────────────────────────────────────────────
 function setupProductEditor() {
-  pCloseBtn.addEventListener('click', closeProductEditor);
-  pCancelBtn.addEventListener('click', closeProductEditor);
+  const pCloseBtn = document.getElementById('product-editor-close');
+  const pCancelBtn = document.getElementById('product-editor-cancel');
+  const btnNewProduct = document.getElementById('btn-new-product');
+  const productSearch = document.getElementById('product-search-input');
+  const productForm = document.getElementById('product-editor-form');
+  const pPhotoInput = document.getElementById('p-photo-input');
+  const btnPickPhotos = document.getElementById('btn-pick-photos');
+  const pNameInput = document.getElementById('p-edit-name');
 
-  // Auto-slug
-  document.getElementById('p-edit-name').addEventListener('input', (e) => {
-    const id = document.getElementById('p-edit-id').value;
-    if (!id) {
-      document.getElementById('p-edit-slug').value = slugify(e.target.value);
-    }
-  });
+  if (btnNewProduct) btnNewProduct.addEventListener('click', () => openProductEditor(null));
+  if (productSearch) productSearch.addEventListener('input', renderProductsList);
+  if (pCloseBtn) pCloseBtn.addEventListener('click', closeProductEditor);
+  if (pCancelBtn) pCancelBtn.addEventListener('click', closeProductEditor);
 
-  // Selector de fotos
-  btnPickPhotos.addEventListener('click', () => pPhotoInput.click());
-  pPhotoInput.addEventListener('change', async (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+  if (pNameInput) {
+    pNameInput.addEventListener('input', (e) => {
+      const id = document.getElementById('p-edit-id')?.value;
+      const slugInput = document.getElementById('p-edit-slug');
+      if (!id && slugInput) {
+        slugInput.value = slugify(e.target.value);
+      }
+    });
+  }
 
-    btnPickPhotos.disabled = true;
-    btnPickPhotos.textContent = 'Comprimiendo y subiendo fotos...';
+  if (btnPickPhotos && pPhotoInput) {
+    btnPickPhotos.addEventListener('click', () => pPhotoInput.click());
+    pPhotoInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
 
-    for (const file of files) {
-      try {
-        const compressedBlob = await compressImageFile(file, 1000, 0.82);
-        const slug = document.getElementById('p-edit-slug').value.trim() || 'prod';
-        const fileName = `${slug}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.webp`;
+      btnPickPhotos.disabled = true;
+      btnPickPhotos.textContent = 'Comprimiendo y subiendo fotos...';
 
-        // Subir a Storage
-        const { error: uploadError } = await supabase.storage
-          .from('productos')
-          .upload(fileName, compressedBlob, { contentType: 'image/webp', upsert: true });
+      for (const file of files) {
+        try {
+          const compressedBlob = await compressImageFile(file, 1000, 0.82);
+          const slug = document.getElementById('p-edit-slug')?.value.trim() || 'prod';
+          const fileName = `${slug}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.webp`;
 
-        if (uploadError) throw uploadError;
+          const { error: uploadError } = await supabase.storage
+            .from('productos')
+            .upload(fileName, compressedBlob, { contentType: 'image/webp', upsert: true });
 
-        // Obtener URL pública
-        const { data: pubData } = supabase.storage.from('productos').getPublicUrl(fileName);
-        if (pubData?.publicUrl) {
-          editingProductImages.push(pubData.publicUrl);
-          renderPhotosPreview();
+          if (uploadError) throw uploadError;
+
+          const { data: pubData } = supabase.storage.from('productos').getPublicUrl(fileName);
+          if (pubData?.publicUrl) {
+            editingProductImages.push(pubData.publicUrl);
+            renderPhotosPreview();
+          }
+        } catch (err) {
+          console.error('Error subiendo imagen:', err);
+          showToast(`Error subiendo imagen: ${err.message}`, 'error');
         }
+      }
+
+      btnPickPhotos.disabled = false;
+      btnPickPhotos.textContent = '📸 Seleccionar o tomar fotos desde el celular';
+      pPhotoInput.value = '';
+    });
+  }
+
+  if (productForm) {
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('p-editor-save-btn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Guardando...';
+      }
+
+      const id = document.getElementById('p-edit-id')?.value || null;
+      const name = document.getElementById('p-edit-name')?.value.trim();
+      const slug = slugify(document.getElementById('p-edit-slug')?.value.trim() || name);
+      const category = document.getElementById('p-edit-category')?.value.trim() || 'Otros';
+      const price = parseInt(document.getElementById('p-edit-price')?.value, 10) || 0;
+      const stock = parseInt(document.getElementById('p-edit-stock')?.value, 10) || 0;
+      const badge = document.getElementById('p-edit-badge')?.value || null;
+      const sort_order = parseInt(document.getElementById('p-edit-order')?.value, 10) || 10;
+      const description = document.getElementById('p-edit-description')?.value.trim();
+      const is_visible = document.getElementById('p-edit-visible')?.checked ?? true;
+      const is_featured = document.getElementById('p-edit-featured')?.checked ?? false;
+
+      const payload = {
+        name,
+        slug,
+        category,
+        price,
+        stock,
+        badge,
+        sort_order,
+        description,
+        is_visible,
+        is_featured,
+        images: editingProductImages.length > 0 ? editingProductImages : ['img/placeholder.svg'],
+      };
+
+      try {
+        if (id) {
+          const { error } = await supabase.from('products').update(payload).eq('id', id);
+          if (error) throw error;
+          showToast('Producto actualizado correctamente');
+        } else {
+          const { error } = await supabase.from('products').insert(payload);
+          if (error) throw error;
+          showToast('Producto creado con éxito');
+        }
+
+        closeProductEditor();
+        loadProducts();
       } catch (err) {
-        console.error('Error subiendo imagen:', err);
-        showToast(`Error subiendo imagen: ${err.message}`, 'error');
+        showToast(err.message, 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Guardar Producto';
+        }
       }
-    }
-
-    btnPickPhotos.disabled = false;
-    btnPickPhotos.textContent = '📸 Seleccionar o tomar fotos desde el celular';
-    pPhotoInput.value = '';
-  });
-
-  // Guardar producto
-  productForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const saveBtn = document.getElementById('p-editor-save-btn');
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Guardando...';
-
-    const id = document.getElementById('p-edit-id').value || null;
-    const name = document.getElementById('p-edit-name').value.trim();
-    const slug = slugify(document.getElementById('p-edit-slug').value.trim() || name);
-    const category = document.getElementById('p-edit-category').value.trim() || 'Otros';
-    const price = parseInt(document.getElementById('p-edit-price').value, 10) || 0;
-    const stock = parseInt(document.getElementById('p-edit-stock').value, 10) || 0;
-    const badge = document.getElementById('p-edit-badge').value || null;
-    const sort_order = parseInt(document.getElementById('p-edit-order').value, 10) || 10;
-    const description = document.getElementById('p-edit-description').value.trim();
-    const is_visible = document.getElementById('p-edit-visible').checked;
-    const is_featured = document.getElementById('p-edit-featured').checked;
-
-    const payload = {
-      name,
-      slug,
-      category,
-      price,
-      stock,
-      badge,
-      sort_order,
-      description,
-      is_visible,
-      is_featured,
-      images: editingProductImages.length > 0 ? editingProductImages : ['img/placeholder.svg'],
-    };
-
-    try {
-      if (id) {
-        const { error } = await supabase.from('products').update(payload).eq('id', id);
-        if (error) throw error;
-        showToast('Producto actualizado correctamente');
-      } else {
-        const { error } = await supabase.from('products').insert(payload);
-        if (error) throw error;
-        showToast('Producto creado con éxito');
-      }
-
-      closeProductEditor();
-      loadProducts();
-    } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Guardar Producto';
-    }
-  });
+    });
+  }
 }
 
 function openProductEditor(product) {
-  productForm.reset();
+  const productForm = document.getElementById('product-editor-form');
+  const pTitle = document.getElementById('product-editor-title');
+  const productModal = document.getElementById('product-editor-modal');
+
+  if (productForm) productForm.reset();
   editingProductImages = [];
 
   if (product) {
-    pTitle.textContent = 'Editar Producto';
+    if (pTitle) pTitle.textContent = 'Editar Producto';
     document.getElementById('p-edit-id').value = product.id;
     document.getElementById('p-edit-name').value = product.name;
     document.getElementById('p-edit-slug').value = product.slug;
@@ -530,7 +566,7 @@ function openProductEditor(product) {
     document.getElementById('p-edit-featured').checked = product.is_featured;
     editingProductImages = [...(product.images || [])];
   } else {
-    pTitle.textContent = 'Nuevo Producto';
+    if (pTitle) pTitle.textContent = 'Nuevo Producto';
     document.getElementById('p-edit-id').value = '';
     document.getElementById('p-edit-order').value = (currentProducts.length + 1) * 10;
     document.getElementById('p-edit-visible').checked = true;
@@ -538,18 +574,26 @@ function openProductEditor(product) {
   }
 
   renderPhotosPreview();
-  productModal.classList.add('is-open');
-  productModal.setAttribute('aria-hidden', 'false');
+  if (productModal) {
+    productModal.classList.add('is-open');
+    productModal.setAttribute('aria-hidden', 'false');
+  }
 }
 
 function closeProductEditor() {
-  productModal.classList.remove('is-open');
-  productModal.setAttribute('aria-hidden', 'true');
+  const productModal = document.getElementById('product-editor-modal');
+  if (productModal) {
+    productModal.classList.remove('is-open');
+    productModal.setAttribute('aria-hidden', 'true');
+  }
 }
 
 function renderPhotosPreview() {
+  const photosPreviewStrip = document.getElementById('photos-preview-strip');
+  if (!photosPreviewStrip) return;
+
   if (editingProductImages.length === 0) {
-    photosPreviewStrip.innerHTML = '<span style="font-size: 0.8rem; color: var(--tiza-50); padding: 0.5rem;">Sin fotos agregadas. Se usará el placeholder por defecto.</span>';
+    photosPreviewStrip.innerHTML = '<span style="font-size: 0.8rem; color: var(--tiza-50); padding: 0.5rem;">Sin fotos agregadas. Se usará el placeholder de marca.</span>';
     return;
   }
 
@@ -569,7 +613,6 @@ function renderPhotosPreview() {
       if (e.target.classList.contains('photo-del-btn')) return;
       const idx = Number(item.dataset.idx);
       if (idx > 0) {
-        // Mover a portada
         const picked = editingProductImages.splice(idx, 1)[0];
         editingProductImages.unshift(picked);
         renderPhotosPreview();
@@ -587,7 +630,6 @@ function renderPhotosPreview() {
   });
 }
 
-/** Comprime una foto en el navegador usando Canvas antes de enviarla a Supabase Storage */
 function compressImageFile(file, maxDimension = 1000, quality = 0.82) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -614,7 +656,7 @@ function compressImageFile(file, maxDimension = 1000, quality = 0.82) {
         canvas.toBlob(
           (blob) => {
             if (blob) resolve(blob);
-            else reject(new Error('Fallo al comprimir imagen en canvas'));
+            else reject(new Error('Fallo al comprimir imagen'));
           },
           'image/webp',
           quality
@@ -631,6 +673,7 @@ function compressImageFile(file, maxDimension = 1000, quality = 0.82) {
 // ─────────────────────────────────────────────────────────────
 async function loadReviews() {
   const container = document.getElementById('reviews-list-container');
+  if (!container || !supabase) return;
   container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--tiza-70);">Cargando reseñas...</div>';
 
   try {
@@ -649,6 +692,8 @@ async function loadReviews() {
 
 function renderReviewsList() {
   const container = document.getElementById('reviews-list-container');
+  if (!container) return;
+
   if (currentReviews.length === 0) {
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--tiza-50);">No hay reseñas creadas. Crea una para exhibirla en la tienda.</div>';
     return;
@@ -679,7 +724,8 @@ function renderReviewsList() {
     .join('');
 
   container.querySelectorAll('[data-r-action]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
       const action = btn.dataset.rAction;
       const id = btn.dataset.id;
       const r = currentReviews.find((x) => x.id === id);
@@ -711,48 +757,60 @@ function renderReviewsList() {
 }
 
 function setupReviewEditor() {
-  rCloseBtn.addEventListener('click', closeReviewEditor);
-  rCancelBtn.addEventListener('click', closeReviewEditor);
-  document.getElementById('btn-new-review').addEventListener('click', () => openReviewEditor(null));
+  const rCloseBtn = document.getElementById('review-editor-close');
+  const rCancelBtn = document.getElementById('review-editor-cancel');
+  const btnNewReview = document.getElementById('btn-new-review');
+  const reviewForm = document.getElementById('review-editor-form');
 
-  reviewForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const saveBtn = document.getElementById('r-editor-save-btn');
-    saveBtn.disabled = true;
+  if (rCloseBtn) rCloseBtn.addEventListener('click', closeReviewEditor);
+  if (rCancelBtn) rCancelBtn.addEventListener('click', closeReviewEditor);
+  if (btnNewReview) btnNewReview.addEventListener('click', () => openReviewEditor(null));
 
-    const id = document.getElementById('r-edit-id').value || null;
-    const author = document.getElementById('r-edit-author').value.trim();
-    const city = document.getElementById('r-edit-city').value.trim();
-    const rating = parseInt(document.getElementById('r-edit-rating').value, 10) || 5;
-    const text = document.getElementById('r-edit-text').value.trim();
-    const is_visible = document.getElementById('r-edit-visible').checked;
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('r-editor-save-btn');
+      if (saveBtn) saveBtn.disabled = true;
 
-    const payload = { author, city, rating, text, is_visible };
+      const id = document.getElementById('r-edit-id')?.value || null;
+      const author = document.getElementById('r-edit-author')?.value.trim();
+      const city = document.getElementById('r-edit-city')?.value.trim();
+      const rating = parseInt(document.getElementById('r-edit-rating')?.value, 10) || 5;
+      const text = document.getElementById('r-edit-text')?.value.trim();
+      const is_visible = document.getElementById('r-edit-visible')?.checked ?? true;
 
-    try {
-      if (id) {
-        const { error } = await supabase.from('reviews').update(payload).eq('id', id);
-        if (error) throw error;
-        showToast('Reseña actualizada');
-      } else {
-        const { error } = await supabase.from('reviews').insert(payload);
-        if (error) throw error;
-        showToast('Reseña creada con éxito');
+      const payload = { author, city, rating, text, is_visible };
+
+      try {
+        if (id) {
+          const { error } = await supabase.from('reviews').update(payload).eq('id', id);
+          if (error) throw error;
+          showToast('Reseña actualizada');
+        } else {
+          const { error } = await supabase.from('reviews').insert(payload);
+          if (error) throw error;
+          showToast('Reseña creada con éxito');
+        }
+        closeReviewEditor();
+        loadReviews();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        if (saveBtn) saveBtn.disabled = false;
       }
-      closeReviewEditor();
-      loadReviews();
-    } catch (err) {
-      showToast(err.message, 'error');
-    } finally {
-      saveBtn.disabled = false;
-    }
-  });
+    });
+  }
 }
 
 function openReviewEditor(review) {
-  reviewForm.reset();
+  const reviewForm = document.getElementById('review-editor-form');
+  const rTitle = document.getElementById('review-editor-title');
+  const reviewModal = document.getElementById('review-editor-modal');
+
+  if (reviewForm) reviewForm.reset();
+
   if (review) {
-    rTitle.textContent = 'Editar Reseña';
+    if (rTitle) rTitle.textContent = 'Editar Reseña';
     document.getElementById('r-edit-id').value = review.id;
     document.getElementById('r-edit-author').value = review.author;
     document.getElementById('r-edit-city').value = review.city || '';
@@ -760,24 +818,30 @@ function openReviewEditor(review) {
     document.getElementById('r-edit-text').value = review.text;
     document.getElementById('r-edit-visible').checked = review.is_visible;
   } else {
-    rTitle.textContent = 'Nueva Reseña';
+    if (rTitle) rTitle.textContent = 'Nueva Reseña';
     document.getElementById('r-edit-id').value = '';
     document.getElementById('r-edit-visible').checked = true;
   }
 
-  reviewModal.classList.add('is-open');
-  reviewModal.setAttribute('aria-hidden', 'false');
+  if (reviewModal) {
+    reviewModal.classList.add('is-open');
+    reviewModal.setAttribute('aria-hidden', 'false');
+  }
 }
 
 function closeReviewEditor() {
-  reviewModal.classList.remove('is-open');
-  reviewModal.setAttribute('aria-hidden', 'true');
+  const reviewModal = document.getElementById('review-editor-modal');
+  if (reviewModal) {
+    reviewModal.classList.remove('is-open');
+    reviewModal.setAttribute('aria-hidden', 'true');
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
 //  4. AJUSTES
 // ─────────────────────────────────────────────────────────────
 async function loadSettings() {
+  if (!supabase) return;
   try {
     const { data, error } = await supabase.from('settings').select('key, value');
     if (error) throw error;
@@ -793,11 +857,15 @@ async function loadSettings() {
 
 function setupSettingsForm() {
   const form = document.getElementById('settings-form');
+  if (!form) return;
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btn-save-settings');
-    btn.disabled = true;
-    btn.textContent = 'Guardando...';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+    }
 
     const formData = new FormData(form);
     const updates = [];
@@ -813,8 +881,10 @@ function setupSettingsForm() {
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Guardar Ajustes';
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Guardar Ajustes';
+      }
     }
   });
 }
@@ -828,5 +898,9 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-document.addEventListener('DOMContentLoaded', initAdmin);
-
+// Inicialización segura garantizada
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAdmin);
+} else {
+  initAdmin();
+}
