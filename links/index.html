@@ -36,6 +36,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Google Analytics 4 (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ETMZT50EQ2" id="ga-tag-src"></script>
+  <script id="ga-init-script">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ETMZT50EQ2', {
+      page_title: 'Estilo Dorado | Link in Bio',
+      page_location: window.location.href,
+      send_page_view: true
+    });
+  </script>
+
   <style>
     /* ==========================================================================
        VARIABLES Y PALETA "ASFALTO & CARBÓN"
@@ -709,9 +722,12 @@
   <script>
     /**
      * CONFIGURACIÓN CENTRALIZADA DE ESTILO DORADO (LINK IN BIO)
-     * Edita aquí cualquier texto, enlace o parámetro fácilmente.
+     * Edita aquí cualquier texto, enlace o tu ID de Google Analytics fácilmente.
      */
     const BIO_CONFIG = {
+      analytics: {
+        measurementId: 'G-ETMZT50EQ2'
+      },
       brand: {
         titleHtml: 'Estilo <em>Dorado</em>',
         subtitle: 'Lujo urbano en oro laminado de triple capa',
@@ -790,6 +806,57 @@
           if (btn) {
             if (item.text) btn.textContent = item.text;
             if (item.url) btn.href = item.url;
+          }
+        });
+
+        // Configuración y eventos personalizados para Google Analytics 4
+        function sendAnalyticsEvent(eventName, params) {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', eventName, params);
+          }
+        }
+
+        // Delegación de eventos de clic en botones y redes sociales
+        document.addEventListener('click', (event) => {
+          const anchor = event.target.closest('a');
+          if (!anchor) return;
+
+          // 1. Clic en los botones principales/secundarios
+          if (anchor.classList.contains('btn')) {
+            const btnId = anchor.id || 'btn-desconocido';
+            const btnText = anchor.textContent.trim();
+
+            sendAnalyticsEvent('click_bio_boton', {
+              boton_id: btnId,
+              boton_texto: btnText,
+              destino_url: anchor.href
+            });
+
+            // Conversión especial para WhatsApp
+            if (btnId === 'btn-whatsapp' || anchor.href.includes('wa.me')) {
+              sendAnalyticsEvent('generate_lead', {
+                canal: 'WhatsApp Asesoría',
+                origen: 'link_in_bio',
+                ubicacion_boton: 'tarjeta_botones'
+              });
+            }
+          }
+
+          // 2. Clic en iconos de redes sociales
+          if (anchor.classList.contains('social-link')) {
+            const red = anchor.id.replace('social-', '') || 'social';
+            sendAnalyticsEvent('click_red_social', {
+              red_social: red,
+              destino_url: anchor.href
+            });
+
+            if (red === 'whatsapp') {
+              sendAnalyticsEvent('generate_lead', {
+                canal: 'WhatsApp Icono',
+                origen: 'link_in_bio',
+                ubicacion_boton: 'hero_iconos'
+              });
+            }
           }
         });
       } catch (err) {
